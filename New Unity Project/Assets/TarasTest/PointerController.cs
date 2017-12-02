@@ -27,6 +27,7 @@ public class PointerController : MonoBehaviour {
 
     private void Update()
     {
+        _camera = Camera.main;
         Cursor.visible = false;
         _input = Input.mousePosition;
         _input = new Vector3(_input.x, _input.y, 10);
