@@ -11,7 +11,7 @@ public class FishController : MonoBehaviour {
         if (collision.CompareTag("Player"))
         {
             _scrPlayer._lifes++;
-            Destroy(this);
+            Destroy(this.gameObject);
         }
     }
 
