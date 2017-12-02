@@ -149,6 +149,7 @@ public class CatController2D : MonoBehaviour {
             }
         }
         force = dir.normalized * _moveForce * Time.fixedDeltaTime;
+        force = new Vector2(force.x, 0);
         _rigidbody.AddForce(force);
 		Debug.DrawRay (transform.position, force, Color.green);
         Debug.DrawRay(targetPos, Vector3.up, Color.yellow);
