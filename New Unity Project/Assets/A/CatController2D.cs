@@ -17,6 +17,7 @@ public class CatController2D : MonoBehaviour {
     [Header("Jump")]
     [SerializeField] float _jumpRange = 3;
     [SerializeField] float _jumpForce = 1000;
+    [SerializeField] float _jumpDuration = 1;
     [SerializeField] AnimationCurve _curve;
 
     Rigidbody2D _rigidbody;
@@ -25,6 +26,7 @@ public class CatController2D : MonoBehaviour {
     bool _isJumping;
     Vector2 _jumpStartPos;
     Vector2 _jumpTargetPos;
+    float _jumpStartTime;
 
     private void Awake()
     {
@@ -61,6 +63,21 @@ public class CatController2D : MonoBehaviour {
         // } else {
         //     enable physics
         // }
+        if (_isJumping)
+        {
+            float curVal = (Time.time - _jumpStartTime) / _jumpDuration;
+            float x = Mathf.Lerp(_jumpStartPos.x, _jumpTargetPos.x, curVal);
+            float y = _curve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
+            transform.position = new Vector3(x, y, transform.position.z);
+            if (curVal >= 1)
+            {
+                _isJumping = false;
+                GetComponent<Collider2D>().isTrigger = false;
+                _rigidbody.isKinematic = false;
+            }
+            return;
+        }
+
         force = Vector3.zero;
         if (!IsGrounded())
         {
@@ -121,11 +138,13 @@ public class CatController2D : MonoBehaviour {
             if (dir.magnitude < _jumpRange)
             {
                 Debug.Log("JUMP!");
-                _rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
-                //_isJumping = true;
-                //_jumpStartPos = new Vector2(transform.position.x, transform.position.y);
-                //_jumpTargetPos = targetPos;
-
+                //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                _isJumping = true;
+                _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
+                _jumpTargetPos = targetPos;
+                _jumpStartTime = Time.time;
+                GetComponent<Collider2D>().isTrigger = true;
+                _rigidbody.isKinematic = true;
                 return;
             }
         }
@@ -149,8 +168,27 @@ public class CatController2D : MonoBehaviour {
             _animator.SetFloat("Speed", -_rigidbody.velocity.magnitude * Time.deltaTime * _speedMult* 10);
     }
 
+    Collider2D _groundCollider;
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Walkable"))
+        {
+            _groundCollider = collision.collider;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Walkable") && collision.collider)
+        {
+            _groundCollider = null;
+        }
+    }
+
     private bool IsGrounded()
     {
+        if (_groundCollider)
+            return true;
         Vector2 pos = new Vector2(_groundDetector.position.x, _groundDetector.position.y);
         var hit = Physics2D.Raycast(pos, Vector2.down, 0.2f);
         Debug.DrawRay(transform.position, Vector3.down, Color.green);
