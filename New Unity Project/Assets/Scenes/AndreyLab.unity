@@ -188,7 +188,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 126624842}
   m_LocalRotation: {x: 0.7070592, y: -0, z: -0, w: 0.70715445}
-  m_LocalPosition: {x: 0, y: -1.17, z: -2.83}
+  m_LocalPosition: {x: 0, y: -1.17, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1675498860}
@@ -357,7 +357,7 @@ GameObject:
   - component: {fileID: 258416490}
   m_Layer: 0
   m_Name: walckable COLLIDER
-  m_TagString: Untagged
+  m_TagString: Walkable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1088,6 +1088,11 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
+--- !u!212 &1215781909 stripped
+SpriteRenderer:
+  m_PrefabParentObject: {fileID: 212905236571515510, guid: 2c9ace75dc970488794d2f9fdf908305,
+    type: 2}
+  m_PrefabInternal: {fileID: 242451126}
 --- !u!1 &1304788190
 GameObject:
   m_ObjectHideFlags: 0
@@ -1178,13 +1183,31 @@ MonoBehaviour:
   _pointer: {fileID: 1413048248}
   _groundDetector: {fileID: 861149091}
   _animator: {fileID: 242451128}
-  _speedMult: 0.1
-  _maxMoveSpeed: 5
+  _speedMult: 8
+  _renderer: {fileID: 1215781909}
   _stopRange: 1
   _visibilityRange: 5
-  _force: 1000
-  _rotForce: 10
-  _fromFloorForce: 10
+  _moveForce: 1000
+  _jumpRange: 3
+  _jumpForce: 20
+  _curve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 4.2187424
+      outSlope: 4.2187424
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: -2.1847816
+      outSlope: -2.1847816
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!50 &1304788195
 Rigidbody2D:
   serializedVersion: 4
@@ -1233,6 +1256,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 002dc6cf8fd149843b3004b51f956575, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _activeColor: {r: 1, g: 0, b: 0, a: 1}
+  _inactiveColor: {r: 0.17826031, g: 0.7058823, b: 0.010380632, a: 0.616}
   isCastOnSomething: 0
   castedCollider: {fileID: 0}
 --- !u!212 &1413048249

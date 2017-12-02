@@ -10,16 +10,21 @@ public class CatController2D : MonoBehaviour {
     [SerializeField] Animator _animator;
     [SerializeField] float _speedMult = 0.1f;
     [Header("Moving")]
-    [SerializeField]
-    float _maxMoveSpeed = 5;
+    [SerializeField] SpriteRenderer _renderer;
     [SerializeField] float _stopRange = 0.2f;
 	[SerializeField] float _visibilityRange = 5;
-    [SerializeField] float _force = 10;
-    [SerializeField] float _rotForce = 10;
-    [SerializeField] float _fromFloorForce = 10;
+    [SerializeField] float _moveForce = 10;
+    [Header("Jump")]
+    [SerializeField] float _jumpRange = 3;
+    [SerializeField] float _jumpForce = 1000;
+    [SerializeField] AnimationCurve _curve;
+
     Rigidbody2D _rigidbody;
-	GameObject[] _climbObjects;
-    Vector3 _lastPos;
+    Vector2 force;
+
+    bool _isJumping;
+    Vector2 _jumpStartPos;
+    Vector2 _jumpTargetPos;
 
     private void Awake()
     {
@@ -35,19 +40,19 @@ public class CatController2D : MonoBehaviour {
 		
 	}
 	
-	// Update is called once per frame
-	void Update ()
+    public enum State
     {
-        _animator.SetFloat("Speed", _rigidbody.velocity.magnitude * Time.deltaTime * _speedMult);
-        //_lastPos = transform.position;
-	}
+        noInput,
+        input
+
+    }
 
 	private bool CanSeePointer() 
 	{
 		return (_pointer.transform.position - transform.position).magnitude < _visibilityRange;
 	}
 
-    private void FixedUpdate()
+    private void Update()
     {
         // if (cat is on any of _climbObjects) {
         //     disable gravity
@@ -56,6 +61,7 @@ public class CatController2D : MonoBehaviour {
         // } else {
         //     enable physics
         // }
+        force = Vector3.zero;
         if (!IsGrounded())
         {
             Debug.Log("not Grounded");
@@ -74,6 +80,7 @@ public class CatController2D : MonoBehaviour {
             if (_pointer.castedCollider.CompareTag("Obstacle"))
             {
                 Debug.Log("Pointer on Obstacle");
+                _pointer.SetActive(false);
                 return;
             }
             targetPos = _pointer.transform.position;
@@ -91,6 +98,7 @@ public class CatController2D : MonoBehaviour {
             if (hit.collider.CompareTag("Obstacle"))
             {
                 Debug.Log("Pointer on Obstacle");
+                _pointer.SetActive(false);
                 return;
             }
             if (hit.collider.CompareTag("Walkable"))
@@ -99,6 +107,7 @@ public class CatController2D : MonoBehaviour {
                 Debug.Log("error");
 
         }
+        _pointer.SetActive(true);
         Vector2 some = targetPos - new Vector2(transform.position.x, transform.position.y);
         Vector2 dir = new Vector2(some.x, some.y);
         if (dir.magnitude < _stopRange)
@@ -106,25 +115,38 @@ public class CatController2D : MonoBehaviour {
             Debug.Log("in stop range");
             return;
         }
-        Vector2 force = dir.normalized * _force * Time.fixedDeltaTime;
+        if ((targetPos.y - transform.position.y) > 1)
+        {
+            Debug.Log("Need to jump");
+            if (dir.magnitude < _jumpRange)
+            {
+                Debug.Log("JUMP!");
+                _rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                //_isJumping = true;
+                //_jumpStartPos = new Vector2(transform.position.x, transform.position.y);
+                //_jumpTargetPos = targetPos;
+
+                return;
+            }
+        }
+        force = dir.normalized * _moveForce * Time.fixedDeltaTime;
         _rigidbody.AddForce(force);
-		Debug.DrawRay (transform.position, force, CanSeePointer () ? Color.green : Color.red, Time.fixedDeltaTime);
+		Debug.DrawRay (transform.position, force, Color.green);
         Debug.DrawRay(targetPos, Vector3.up, Color.yellow);
+
+        // ANIMATION
         
-        
-		// if (cat is moving up) {
-		// *     disable collisions (to climb from beneath)
-		// * } else {
-		// *     enable collisions
-		// * }
-		// * 
-		// * /
-		///*
-		//if (Mathf.Abs(angle) > 10)
-  //          _rigidbody.AddTorque(Vector3.up * _rotForce * Mathf.Sign(angle));
-  //      if (Mathf.Abs(angle) < 90)
-  //          _rigidbody.AddForce(force, ForceMode.Acceleration);
-            
+    }
+
+    private void LateUpdate()
+    {
+        if (Mathf.Sign(_rigidbody.velocity.x) == Mathf.Sign(force.x))
+        {
+            _renderer.flipX = force.x < 0 && Mathf.Abs(force.x) > 10;
+            _animator.SetFloat("Speed", _rigidbody.velocity.magnitude * Time.deltaTime * _speedMult);
+        }
+        else
+            _animator.SetFloat("Speed", -_rigidbody.velocity.magnitude * Time.deltaTime * _speedMult* 10);
     }
 
     private bool IsGrounded()
