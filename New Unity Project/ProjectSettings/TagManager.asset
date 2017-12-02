@@ -3,12 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Climb
-  - Surface
-  - Walkable
-  - Climbable
-  - Obstacle
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -43,12 +38,6 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Background
-    uniqueID: 4080548897
-    locked: 0
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Foreground
-    uniqueID: 1525978949
     locked: 0

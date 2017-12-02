@@ -86,6 +86,7 @@ public class CatController2D : MonoBehaviour {
     {
         Vector2 pos = new Vector2(transform.position.x, transform.position.y);
         var hit = Physics2D.Raycast(pos, Vector2.down, 0.1f);
+        
         if (hit.transform != null && hit.transform.CompareTag("Walkable"))
             return true;
         return false;
