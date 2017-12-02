@@ -74,6 +74,7 @@ public class CatController2D : MonoBehaviour {
                 _isJumping = false;
                 GetComponent<Collider2D>().isTrigger = false;
                 _rigidbody.isKinematic = false;
+                _rigidbody.velocity = Vector2.zero;
             }
             return;
         }
@@ -162,7 +163,7 @@ public class CatController2D : MonoBehaviour {
     {
         if (Mathf.Sign(_rigidbody.velocity.x) == Mathf.Sign(force.x))
         {
-            _renderer.flipX = force.x < 0 && Mathf.Abs(force.x) > 10;
+            _renderer.flipX = force.x < 0 && Mathf.Abs(force.x) > 1;
             _animator.SetFloat("Speed", _rigidbody.velocity.magnitude * Time.deltaTime * _speedMult);
         }
         else
