@@ -10,7 +10,9 @@ public class BossController : MonoBehaviour {
 	[SerializeField] float _catHitAttackDelay;
 	[SerializeField] float _attackPositionY;
 	[SerializeField] float _handDownTime = 1f;
+	[SerializeField] AnimationCurve _handDownCurve;
 	[SerializeField] float _handUpTime = 1.5f;
+	[SerializeField] AnimationCurve _handUpCurve;
 	[SerializeField] float _nearestHandThreshold = 4f;
 	[SerializeField] Transform _leftHand;
 	[SerializeField] Transform _rightHand;
@@ -59,19 +61,24 @@ public class BossController : MonoBehaviour {
 
 				Transform hand = _lastAttackIsRightHand ? _rightHand : _leftHand;
 				BoxCollider2D collider = hand.GetComponent<BoxCollider2D> ();
+				AnimationCurve curve;
 				float handPosCoeff = 0f;
 				if (_timeSinceLastAttack < _handDownTime) {
 					// Down
 					handPosCoeff = _timeSinceLastAttack / _handDownTime;
+					curve = _handDownCurve;
 				} else {
 					// Up
 					handPosCoeff = 1f - (_timeSinceLastAttack - _handDownTime) / _handUpTime;
+					curve = _handUpCurve;
 				}
 				if (handPosCoeff < 0f) {
 					handPosCoeff = 0f;
 				} else if (handPosCoeff > 1f) {
 					handPosCoeff = 1f;
 				}
+
+				handPosCoeff = curve.Evaluate (handPosCoeff);
 
 				if (_lastAttackIsRightHand) {
 					_leftHand.transform.position = _leftHandStartingPos;
