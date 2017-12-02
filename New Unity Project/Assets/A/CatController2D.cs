@@ -20,7 +20,18 @@ public class CatController2D : MonoBehaviour {
     [SerializeField] float _jumpNeededSpeed = 5;
     [SerializeField] float _jumpForce = 1000;
     [SerializeField] float _jumpDuration = 1;
-    [SerializeField] AnimationCurve _curve;
+    [SerializeField] float _jumpUpHeight = 1;
+    [SerializeField] JumpType _curJumpType;
+    [SerializeField] AnimationCurve _jumpUpCurve;
+    [SerializeField] AnimationCurve _jumpForwardCurve;
+    [SerializeField] AnimationCurve _jumpDownCurve;
+
+    public enum JumpType
+    {
+        up,
+        forward,
+        down
+    }
 
     Rigidbody2D _rigidbody;
     Vector2 force;
@@ -69,9 +80,26 @@ public class CatController2D : MonoBehaviour {
         {
             Debug.DrawRay(_jumpStartPos, Vector3.up, Color.blue);
             Debug.DrawRay(_jumpTargetPos, Vector3.up, Color.blue);
+
             float curVal = (Time.time - _jumpStartTime) / _jumpDuration;
             float x = Mathf.Lerp(_jumpStartPos.x, _jumpTargetPos.x, curVal);
-            float y = _jumpStartPos.y + _curve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
+            float y = _jumpStartPos.y + _jumpUpCurve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
+            switch (_curJumpType)
+            {
+                case JumpType.up:
+                    x = Mathf.Lerp(_jumpStartPos.x, _jumpTargetPos.x, curVal);
+                    y = _jumpStartPos.y + _jumpUpCurve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
+                    break;
+                case JumpType.forward:
+                    x = Mathf.Lerp(_jumpStartPos.x, _jumpTargetPos.x, curVal);
+                    y = _jumpStartPos.y + _jumpForwardCurve.Evaluate(curVal) * (Mathf.Abs(_jumpTargetPos.x - _jumpStartPos.x));
+                    break;
+                case JumpType.down:
+                    Debug.LogError("WTF");
+                    break;
+                default:
+                    break;
+            }
             transform.position = new Vector3(x, y, transform.position.z);
             if (curVal >= 1)
             {
@@ -80,7 +108,7 @@ public class CatController2D : MonoBehaviour {
                 _rigidbody.isKinematic = false;
                 _rigidbody.velocity = new Vector2(
                     (_jumpTargetPos.x - _jumpStartPos.x)*3,
-                    -5
+                    -3
                     );
                     
             }
@@ -101,7 +129,7 @@ public class CatController2D : MonoBehaviour {
             return;
         }
         Vector2 targetPos = Vector3.zero;
-
+        Collider2D targetCollider = null;
         //if (_pointer.isCastOnSomething)
         //{
         //    if (_pointer.castedCollider.CompareTag("Obstacle"))
@@ -128,10 +156,13 @@ public class CatController2D : MonoBehaviour {
                 _pointer.SetActive(false);
                 return;
             }
-            if (hit.collider.CompareTag("Walkable"))
-                targetPos = hit.point;
-            else
-                Debug.Log("error");
+        if (hit.collider.CompareTag("Walkable"))
+        {
+            targetPos = hit.point;
+            targetCollider = hit.collider;
+        }
+        else
+            Debug.Log("error");
 
         _pointer.SetActive(true);
         Vector2 some = targetPos - new Vector2(transform.position.x, transform.position.y);
@@ -141,28 +172,53 @@ public class CatController2D : MonoBehaviour {
             Debug.Log("in stop range");
             return;
         }
-        if ((targetPos.y - transform.position.y) > 1)
+        if (targetCollider != _groundCollider && ((targetPos.y - transform.position.y) > _jumpUpHeight || _edgeCollider != null))
         {
             Debug.Log("Need to jump");
             if (dir.magnitude < _jumpRange)
             {
-                if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
+                // JUMP UP
+                if ((targetPos.y - transform.position.y) > _jumpUpHeight)
+                    if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
+                    {
+                        Debug.Log("JUMP UP!");
+                        _curJumpType = JumpType.up;
+                        //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                        _isJumping = true;
+                        _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
+                        _jumpTargetPos = targetPos;
+                        _jumpStartTime = Time.time;
+                        GetComponent<Collider2D>().isTrigger = true;
+                        _rigidbody.isKinematic = true;
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("not enough speed");
+                    }
+                // JUMP FORWARD
+                if (true)//(targetPos.y - transform.position.y) < _jumpUpHeight && (targetPos.y - transform.position.y) > -_jumpUpHeight)
                 {
-                    Debug.Log("JUMP!");
-                    //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
-                    _isJumping = true;
-                    _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
-                    _jumpTargetPos = targetPos;
-                    _jumpStartTime = Time.time;
-                    GetComponent<Collider2D>().isTrigger = true;
-                    _rigidbody.isKinematic = true;
-                    return;
-                }
-                else
-                {
-                    Debug.Log("not enough speed");
+                    if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
+                    {
+                        Debug.Log("JUMP FORWARD!");
+                        _curJumpType = JumpType.forward;
+                        //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                        _isJumping = true;
+                        _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
+                        _jumpTargetPos = targetPos;
+                        _jumpStartTime = Time.time;
+                        GetComponent<Collider2D>().isTrigger = true;
+                        _rigidbody.isKinematic = true;
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("not enough speed");
+                    }
                 }
             }
+            // JUMP DOWN
         }
         force = new Vector2(dir.x, 0).normalized * _moveForce * Time.fixedDeltaTime;
         _rigidbody.AddForce(force);
@@ -189,6 +245,36 @@ public class CatController2D : MonoBehaviour {
     }
 
     Collider2D _groundCollider;
+    Collider2D _edgeCollider;
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Edge"))
+        {
+            _edgeCollider = collider;
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Edge"))
+        {
+            if (_edgeCollider!=null && collider != _edgeCollider)
+                Debug.LogError("WTF");
+            _edgeCollider = collider;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Edge"))
+        {
+            if (collider != _edgeCollider)
+                Debug.LogError("WTF");
+            _edgeCollider = null;
+        }
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.collider.CompareTag("Walkable"))
