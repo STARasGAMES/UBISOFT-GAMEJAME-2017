@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Wlkable
   - Climbable
   - Obstacle
+  - Walkable
   layers:
   - Default
   - TransparentFX
