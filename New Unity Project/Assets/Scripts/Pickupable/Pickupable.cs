@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FishController : MonoBehaviour {
+public abstract class Pickupable : MonoBehaviour {
 
-    [SerializeField] ScriptablePlayer _scrPlayer;
+    [SerializeField] protected ScriptablePlayer _scriptablePlayer;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            _scrPlayer._lifes++;
+            Pickup();
             Destroy(this.gameObject);
         }
     }
 
+    protected abstract void Pickup();
 }
