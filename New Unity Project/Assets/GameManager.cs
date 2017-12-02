@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     //[SerializeField] List<string> _levels;
     [SerializeField] FadeController _fadeController;
     [SerializeField] List<GameObject> _playerObjects;
+    [SerializeField] ScriptablePlayer _scriptablePlayer;
 
     private void Awake()
     {
@@ -21,6 +22,12 @@ public class GameManager : MonoBehaviour {
         _curSceneIndex = 0;
     }
 
+    public void StartGame()
+    {
+        _scriptablePlayer._lifes = 3;
+        NextLevel();
+    }
+
     public void NextLevel()
     {
         StartCoroutine(NextLevelCoroutine());
@@ -28,12 +35,15 @@ public class GameManager : MonoBehaviour {
 
     private IEnumerator NextLevelCoroutine()
     {
+        _curSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        
         _curSceneIndex++;
         if (_curSceneIndex >= SceneManager.sceneCountInBuildSettings)
         {
             ToMainMenu();
             yield break;
         }
+        ;
         yield return StartCoroutine(_fadeController.FadeIn());
         SceneManager.LoadScene(_curSceneIndex, LoadSceneMode.Single);
         foreach (GameObject g in _playerObjects)
