@@ -9,15 +9,18 @@ public class BossController : MonoBehaviour {
 	[SerializeField] float _defaultAttackDelay;
 	[SerializeField] float _catHitAttackDelay;
 	[SerializeField] float _attackPositionY;
-	[SerializeField] float _handDownTime = 1f;
-	[SerializeField] AnimationCurve _handDownCurve;
-	[SerializeField] float _handUpTime = 1.5f;
-	[SerializeField] AnimationCurve _handUpCurve;
+	// [SerializeField] float _handDownTime = 1f;
+	// [SerializeField] AnimationCurve _handDownCurve;
+	// [SerializeField] float _handUpTime = 1.5f;
+	// [SerializeField] AnimationCurve _handUpCurve;
 	[SerializeField] float _nearestHandThreshold = 4f;
 	[SerializeField] Transform _leftHand;
 	[SerializeField] Transform _rightHand;
 	[SerializeField] public bool _currentAttackHit;
 
+
+	private Animator _leftHandAnimator;
+	private Animator _rightHandAnimator;
 	private bool _attacking;
 	private Vector3 _leftHandStartingPos = new Vector3();
 	private Vector3 _rightHandStartingPos = new Vector3();
@@ -27,6 +30,8 @@ public class BossController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		_leftHandAnimator = _leftHand.GetComponent<Animator> ();
+		_rightHandAnimator = _rightHand.GetComponent<Animator> ();
 		_timeSinceLastAttack = 0f;
 		_leftHandStartingPos.Set (_leftHand.transform.position.x, _leftHand.transform.position.y, _leftHand.transform.position.z);
 		_rightHandStartingPos.Set (_rightHand.transform.position.x, _rightHand.transform.position.y, _rightHand.transform.position.z);
@@ -51,12 +56,30 @@ public class BossController : MonoBehaviour {
 				// Between two hands
 				_lastAttackIsRightHand = !_lastAttackIsRightHand;
 			}
+			if (_lastAttackIsRightHand) {
+				// _rightHand.transform.rotation = Quaternion.LookRotation (_cat.transform.position - _rightHand.transform.position);
+
+				// float z = Vector3.SignedAngle (Vector3.down, _cat.transform.position - _rightHand.transform.position, Vector3.forward);
+				// _rightHand.transform.rotation = new Vector3 (0f, 0f, z);
+
+				// TODO _rightHand повернуть в сторону _cat
+
+				_rightHandAnimator.SetTrigger ("RightAttack");
+			} else {
+				// _leftHand.transform.rotation = Quaternion.LookRotation (_cat.transform.position - _leftHand.transform.position);
+
+				// TODO _leftHand повернуть в сторону _cat
+
+				_leftHandAnimator.SetTrigger ("LeftAttack");
+			}
 			_timeSinceLastAttack = 0f;
 		}
 
 		if (_attacking) {
-			if (_timeSinceLastAttack < _handDownTime + _handUpTime) {
+			if (_timeSinceLastAttack < _currentAttackDelay) {
+			// if (_timeSinceLastAttack < _handDownTime + _handUpTime) {
 				// Hand is moving
+				/*
 				_attacking = true;
 
 				Transform hand = _lastAttackIsRightHand ? _rightHand : _leftHand;
@@ -103,6 +126,7 @@ public class BossController : MonoBehaviour {
 				}
 
 				collider.enabled = !(_currentAttackHit || _timeSinceLastAttack > _handDownTime); // Cat was hit or hand is moving up
+				*/
 			} else {
 				// Hands stoped moving (end of attack)
 				if (_currentAttackHit) {
