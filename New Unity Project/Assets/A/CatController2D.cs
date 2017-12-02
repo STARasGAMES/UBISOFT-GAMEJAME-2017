@@ -14,6 +14,7 @@ public class CatController2D : MonoBehaviour {
     [SerializeField] float _stopRange = 0.2f;
 	[SerializeField] float _visibilityRange = 5;
     [SerializeField] float _moveForce = 10;
+    [SerializeField] float _fallForce = 100;
     [Header("Jump")]
     [SerializeField] float _jumpRange = 3;
     [SerializeField] float _jumpForce = 1000;
@@ -65,16 +66,22 @@ public class CatController2D : MonoBehaviour {
         // }
         if (_isJumping)
         {
+            Debug.DrawRay(_jumpStartPos, Vector3.up, Color.blue);
+            Debug.DrawRay(_jumpTargetPos, Vector3.up, Color.blue);
             float curVal = (Time.time - _jumpStartTime) / _jumpDuration;
             float x = Mathf.Lerp(_jumpStartPos.x, _jumpTargetPos.x, curVal);
-            float y = _curve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
+            float y = _jumpStartPos.y + _curve.Evaluate(curVal) * (_jumpTargetPos.y - _jumpStartPos.y);
             transform.position = new Vector3(x, y, transform.position.z);
             if (curVal >= 1)
             {
                 _isJumping = false;
                 GetComponent<Collider2D>().isTrigger = false;
                 _rigidbody.isKinematic = false;
-                _rigidbody.velocity = Vector2.zero;
+                _rigidbody.velocity = new Vector2(
+                    (_jumpTargetPos.x - _jumpStartPos.x)*3,
+                    -5
+                    );
+                    
             }
             return;
         }
@@ -82,6 +89,7 @@ public class CatController2D : MonoBehaviour {
         force = Vector3.zero;
         if (!IsGrounded())
         {
+            _rigidbody.AddForce(Vector2.down*_fallForce*Time.deltaTime);
             Debug.Log("not Grounded");
             return;
         }
@@ -128,7 +136,7 @@ public class CatController2D : MonoBehaviour {
         _pointer.SetActive(true);
         Vector2 some = targetPos - new Vector2(transform.position.x, transform.position.y);
         Vector2 dir = new Vector2(some.x, some.y);
-        if (dir.magnitude < _stopRange)
+        if ( Mathf.Abs(dir.x) < _stopRange)
         {
             Debug.Log("in stop range");
             return;
@@ -149,8 +157,7 @@ public class CatController2D : MonoBehaviour {
                 return;
             }
         }
-        force = dir.normalized * _moveForce * Time.fixedDeltaTime;
-        force = new Vector2(force.x, 0);
+        force = new Vector2(dir.x, 0).normalized * _moveForce * Time.fixedDeltaTime;
         _rigidbody.AddForce(force);
 		Debug.DrawRay (transform.position, force, Color.green);
         Debug.DrawRay(targetPos, Vector3.up, Color.yellow);
@@ -163,6 +170,7 @@ public class CatController2D : MonoBehaviour {
     {
         if (Mathf.Sign(_rigidbody.velocity.x) == Mathf.Sign(force.x))
         {
+            
             _renderer.flipX = force.x < 0 && Mathf.Abs(force.x) > 1;
             _animator.SetFloat("Speed", _rigidbody.velocity.magnitude * Time.deltaTime * _speedMult);
         }
