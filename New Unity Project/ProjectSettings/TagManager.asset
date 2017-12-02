@@ -7,6 +7,8 @@ TagManager:
   - Climbable
   - Obstacle
   - Walkable
+  - Climb
+  - Edge
   layers:
   - Default
   - TransparentFX
