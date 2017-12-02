@@ -40,7 +40,6 @@ public class PointerController : MonoBehaviour {
             isCastOnSomething = true;
             castedCollider = hit.collider;
         }
-        Debug.DrawRay(hit.point, Vector3.up, Color.red, Time.deltaTime);
     }
 
     public void SetActive(bool active)

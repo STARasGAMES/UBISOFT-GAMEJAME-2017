@@ -17,6 +17,7 @@ public class CatController2D : MonoBehaviour {
     [SerializeField] float _fallForce = 100;
     [Header("Jump")]
     [SerializeField] float _jumpRange = 3;
+    [SerializeField] float _jumpNeededSpeed = 5;
     [SerializeField] float _jumpForce = 1000;
     [SerializeField] float _jumpDuration = 1;
     [SerializeField] AnimationCurve _curve;
@@ -101,20 +102,20 @@ public class CatController2D : MonoBehaviour {
         }
         Vector2 targetPos = Vector3.zero;
 
-        if (_pointer.isCastOnSomething)
-        {
-            if (_pointer.castedCollider.CompareTag("Obstacle"))
-            {
-                Debug.Log("Pointer on Obstacle");
-                _pointer.SetActive(false);
-                return;
-            }
-            targetPos = _pointer.transform.position;
-        }
-        else
-        {
+        //if (_pointer.isCastOnSomething)
+        //{
+        //    if (_pointer.castedCollider.CompareTag("Obstacle"))
+        //    {
+        //        Debug.Log("Pointer on Obstacle");
+        //        _pointer.SetActive(false);
+        //        return;
+        //    }
+        //    targetPos = _pointer.transform.position;
+        //}
+        //else
+        //{
             Vector2 pos = new Vector2(_pointer.transform.position.x, _pointer.transform.position.y);
-            Debug.DrawRay(pos, Vector2.down, Color.white);
+            Debug.DrawRay(pos + Vector2.up, Vector2.down, Color.white);
             RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.down, 100);
             if (hit.transform == null)
             {
@@ -132,7 +133,6 @@ public class CatController2D : MonoBehaviour {
             else
                 Debug.Log("error");
 
-        }
         _pointer.SetActive(true);
         Vector2 some = targetPos - new Vector2(transform.position.x, transform.position.y);
         Vector2 dir = new Vector2(some.x, some.y);
@@ -146,15 +146,22 @@ public class CatController2D : MonoBehaviour {
             Debug.Log("Need to jump");
             if (dir.magnitude < _jumpRange)
             {
-                Debug.Log("JUMP!");
-                //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
-                _isJumping = true;
-                _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
-                _jumpTargetPos = targetPos;
-                _jumpStartTime = Time.time;
-                GetComponent<Collider2D>().isTrigger = true;
-                _rigidbody.isKinematic = true;
-                return;
+                if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
+                {
+                    Debug.Log("JUMP!");
+                    //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+                    _isJumping = true;
+                    _jumpStartPos = new Vector2(transform.position.x, transform.position.y);
+                    _jumpTargetPos = targetPos;
+                    _jumpStartTime = Time.time;
+                    GetComponent<Collider2D>().isTrigger = true;
+                    _rigidbody.isKinematic = true;
+                    return;
+                }
+                else
+                {
+                    Debug.Log("not enough speed");
+                }
             }
         }
         force = new Vector2(dir.x, 0).normalized * _moveForce * Time.fixedDeltaTime;
@@ -168,6 +175,9 @@ public class CatController2D : MonoBehaviour {
 
     private void LateUpdate()
     {
+        _animator.SetBool("Jump", _isJumping);
+        if (_isJumping)
+            return;
         if (Mathf.Sign(_rigidbody.velocity.x) == Mathf.Sign(force.x))
         {
             
