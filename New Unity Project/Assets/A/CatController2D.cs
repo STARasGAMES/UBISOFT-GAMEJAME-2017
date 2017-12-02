@@ -6,6 +6,9 @@ public class CatController2D : MonoBehaviour {
 
 	[SerializeField] PointerController _pointer;
     [SerializeField] Transform _groundDetector;
+    [Header("Animation")]
+    [SerializeField] Animator _animator;
+    [SerializeField] float _speedMult = 0.1f;
     [Header("Moving")]
     [SerializeField]
     float _maxMoveSpeed = 5;
@@ -16,6 +19,7 @@ public class CatController2D : MonoBehaviour {
     [SerializeField] float _fromFloorForce = 10;
     Rigidbody2D _rigidbody;
 	GameObject[] _climbObjects;
+    Vector3 _lastPos;
 
     private void Awake()
     {
@@ -32,8 +36,10 @@ public class CatController2D : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update ()
+    {
+        _animator.SetFloat("Speed", _rigidbody.velocity.magnitude * Time.deltaTime * _speedMult);
+        //_lastPos = transform.position;
 	}
 
 	private bool CanSeePointer() 
