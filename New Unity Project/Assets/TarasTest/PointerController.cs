@@ -4,31 +4,31 @@ using UnityEngine;
 
 public class PointerController : MonoBehaviour {
 
-    [SerializeField] Transform _pointer;
-    [SerializeField] float _height = 0.1f;
+    Transform _transform;
 
     Camera _camera;
     Vector3 _input;
+
+    //public Collider 
+
     private void Awake()
     {
-        _camera = GetComponent<Camera>();
+        _camera = Camera.main;
+        _transform = transform;
     }
 
     private void Update()
     {
         _input = Input.mousePosition;
+        _input = new Vector3(_input.x, _input.y, 10);
+        _transform.position = _camera.ScreenToWorldPoint(_input);
+        var hit = Physics2D.GetRayIntersection(_camera.ScreenPointToRay(Input.mousePosition));
+        Debug.Log(hit.transform);
+        Debug.DrawRay(hit.point, Vector3.up, Color.red, Time.deltaTime);
     }
 
     // Update is called once per frame
     void FixedUpdate () {
-        
-        RaycastHit hit;
-        Ray ray = _camera.ScreenPointToRay(_input);
-        if (Physics.Raycast(ray, out hit, 10000))
-        {
-            _pointer.position = hit.point + hit.normal.normalized * _height;
-            _pointer.rotation = Quaternion.LookRotation(hit.normal);
-            Debug.DrawRay(hit.point, hit.normal, Color.green, Time.fixedDeltaTime);
-        }
+       
 	}
 }
