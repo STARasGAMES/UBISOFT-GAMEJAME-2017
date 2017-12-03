@@ -46,7 +46,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1364800323319970
 GameObject:
   m_ObjectHideFlags: 1
@@ -364,7 +364,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 114938844090779018}
-        m_MethodName: NextLevel
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -534,7 +534,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _curSceneIndex: 0
   _fadeController: {fileID: 114102078450799760}
-  _playerObjects: []
+  _playerObjects:
+  - {fileID: 1179958811835666}
   _scriptablePlayer: {fileID: 11400000, guid: 1ee3b4b6b19f32448a4af717be0412e0, type: 2}
 --- !u!222 &222057716796739968
 CanvasRenderer:
@@ -593,16 +594,16 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1179958811835666}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 227.4, y: 155.3, z: 0}
+  m_LocalPosition: {x: -30, y: 35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224607217882707266}
   m_Father: {fileID: 224884149592478466}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 227.4, y: 155.3}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -80, y: -15}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224297198751296746
