@@ -16,5 +16,6 @@ public abstract class Pickupable : MonoBehaviour {
         }
     }
 
+
     protected abstract void Pickup();
 }
