@@ -9,11 +9,16 @@ public class BossController : MonoBehaviour {
 	[SerializeField] float _defaultAttackDelay;
 	[SerializeField] float _catHitAttackDelay;
 	[SerializeField] float _attackPositionY;
+	[SerializeField] float _handMoveResetDelay = 1f;
+	[SerializeField] float _handMoveTime = 0.5f;
+	[SerializeField] float _handMoveMultiplier = 0.5f;
+	[SerializeField] float _handReturnRotationTime = 0.2f;
+	[SerializeField] AnimationCurve _handMoveCurve;
 	// [SerializeField] float _handDownTime = 1f;
 	// [SerializeField] AnimationCurve _handDownCurve;
 	// [SerializeField] float _handUpTime = 1.5f;
 	// [SerializeField] AnimationCurve _handUpCurve;
-	[SerializeField] float _nearestHandThreshold = 4f;
+	[SerializeField] float _nearestHandThreshold = 1f;
 	[SerializeField] Transform _leftHand;
 	[SerializeField] Transform _rightHand;
 	[SerializeField] public bool _currentAttackHit;
@@ -21,11 +26,11 @@ public class BossController : MonoBehaviour {
 
 	private Animator _leftHandAnimator;
 	private Animator _rightHandAnimator;
+	private float _targetHandZAngle;
 	private bool _attacking;
 	private Vector3 _leftHandStartingPos = new Vector3();
 	private Vector3 _rightHandStartingPos = new Vector3();
 	private float _timeSinceLastAttack;
-	private float _currentAttackDuration;
 	private float _currentAttackPositionX;
 
 	// Use this for initialization
@@ -37,97 +42,80 @@ public class BossController : MonoBehaviour {
 		_rightHandStartingPos.Set (_rightHand.transform.position.x, _rightHand.transform.position.y, _rightHand.transform.position.z);
 	}
 
+	private float GetZAngleBetweenPoints(Vector2 pointOne, Vector2 pointTwo) {
+		return Mathf.Rad2Deg * Mathf.Atan2(pointTwo.y - pointOne.y, pointTwo.x - pointOne.x) + 90f;
+	}
+
+	private void OnAttackStart() {
+		_currentAttackPositionX = _cat.position.x;
+		_currentAttackHit = false;
+
+		if (_currentAttackPositionX < _leftHandStartingPos.x + _nearestHandThreshold) {
+			// Left side of the screen
+			_lastAttackIsRightHand = false;
+		} else if (_currentAttackPositionX > _rightHandStartingPos.x - _nearestHandThreshold) {
+			// Right side of the screen
+			_lastAttackIsRightHand = true;
+		} else {
+			// Between two hands
+			_lastAttackIsRightHand = !_lastAttackIsRightHand;
+		}
+
+		if (_lastAttackIsRightHand) {
+			Vector3 position = new Vector3 (_rightHandStartingPos.x + (_cat.transform.position.x - _rightHandStartingPos.x) * _handMoveMultiplier, _rightHand.transform.position.y, _rightHand.transform.position.z);
+			_rightHand.transform.position = position;
+
+			_targetHandZAngle = GetZAngleBetweenPoints (_rightHand.transform.position, _cat.transform.position);
+			_rightHandAnimator.SetTrigger ("RightAttack");
+		} else {
+			Vector3 position = new Vector3 (_leftHandStartingPos.x + (_cat.transform.position.x - _leftHandStartingPos.x) * _handMoveMultiplier, _leftHand.transform.position.y, _leftHand.transform.position.z);
+			_leftHand.transform.position = position;
+
+			_targetHandZAngle = GetZAngleBetweenPoints (_leftHand.transform.position, _cat.transform.position);
+			_leftHandAnimator.SetTrigger ("LeftAttack");
+		}
+	}
+
+	private void OnAttackProgress() {
+		float moveCoeff = 0f;
+		if (_timeSinceLastAttack > _handMoveResetDelay) {
+			moveCoeff = 1f - ((_timeSinceLastAttack -_handMoveResetDelay) / _handReturnRotationTime);
+		} else {
+			moveCoeff = _timeSinceLastAttack / _handMoveTime;
+		}
+
+		Mathf.Clamp01 (moveCoeff);
+		moveCoeff = _handMoveCurve.Evaluate (moveCoeff);
+
+		Vector3 rotation = new Vector3 (0f, 0f, _targetHandZAngle * moveCoeff);
+		if (_lastAttackIsRightHand) {
+			_rightHand.transform.rotation = new Quaternion ();
+			_rightHand.transform.Rotate (rotation);
+		} else {
+			_leftHand.transform.rotation = new Quaternion ();
+			_leftHand.transform.Rotate (rotation);
+		}
+
+		if (_timeSinceLastAttack >= _handMoveResetDelay + _handReturnRotationTime) {
+			_rightHand.transform.position = _rightHandStartingPos;
+			_leftHand.transform.position = _leftHandStartingPos;
+		}
+	}
+
 	// Update is called once per frame
 	void FixedUpdate () {
 		_timeSinceLastAttack += Time.fixedDeltaTime;
 		if (_timeSinceLastAttack > _currentAttackDelay) {
 			// Attack
-			_attacking = true;
-			_currentAttackPositionX = _cat.position.x;
-			_currentAttackHit = false;
-
-			if (_currentAttackPositionX < _leftHandStartingPos.x + _nearestHandThreshold) {
-				// Left side of the screen
-				_lastAttackIsRightHand = false;
-			} else if (_currentAttackPositionX > _rightHandStartingPos.x - _nearestHandThreshold) {
-				// Right side of the screen
-				_lastAttackIsRightHand = true;
-			} else {
-				// Between two hands
-				_lastAttackIsRightHand = !_lastAttackIsRightHand;
-			}
-			if (_lastAttackIsRightHand) {
-				// _rightHand.transform.rotation = Quaternion.LookRotation (_cat.transform.position - _rightHand.transform.position);
-
-				// float z = Vector3.SignedAngle (Vector3.down, _cat.transform.position - _rightHand.transform.position, Vector3.forward);
-				// _rightHand.transform.rotation = new Vector3 (0f, 0f, z);
-
-				// TODO _rightHand повернуть в сторону _cat
-
-				_rightHandAnimator.SetTrigger ("RightAttack");
-			} else {
-				// _leftHand.transform.rotation = Quaternion.LookRotation (_cat.transform.position - _leftHand.transform.position);
-
-				// TODO _leftHand повернуть в сторону _cat
-
-				_leftHandAnimator.SetTrigger ("LeftAttack");
-			}
 			_timeSinceLastAttack = 0f;
+			_attacking = true;
+			OnAttackStart();
 		}
 
 		if (_attacking) {
-			if (_timeSinceLastAttack < _currentAttackDelay) {
-			// if (_timeSinceLastAttack < _handDownTime + _handUpTime) {
-				// Hand is moving
-				/*
-				_attacking = true;
+			OnAttackProgress ();
 
-				Transform hand = _lastAttackIsRightHand ? _rightHand : _leftHand;
-				BoxCollider2D collider = hand.GetComponent<BoxCollider2D> ();
-				AnimationCurve curve;
-				float handPosCoeff = 0f;
-				if (_timeSinceLastAttack < _handDownTime) {
-					// Down
-					handPosCoeff = _timeSinceLastAttack / _handDownTime;
-					curve = _handDownCurve;
-				} else {
-					// Up
-					handPosCoeff = 1f - (_timeSinceLastAttack - _handDownTime) / _handUpTime;
-					curve = _handUpCurve;
-				}
-				if (handPosCoeff < 0f) {
-					handPosCoeff = 0f;
-				} else if (handPosCoeff > 1f) {
-					handPosCoeff = 1f;
-				}
-
-				handPosCoeff = curve.Evaluate (handPosCoeff);
-
-				if (_lastAttackIsRightHand) {
-					_leftHand.transform.position = _leftHandStartingPos;
-
-					Vector3 newPos = new Vector3 ();
-					newPos.Set (
-						_rightHandStartingPos.x + (_currentAttackPositionX - _rightHandStartingPos.x) * handPosCoeff, 
-						_rightHandStartingPos.y + (_attackPositionY - _rightHandStartingPos.y) * handPosCoeff, 
-						_rightHandStartingPos.z 
-					);
-					_rightHand.transform.position = newPos;
-				} else {
-					_rightHand.transform.position = _rightHandStartingPos;
-
-					Vector3 newPos = new Vector3 ();
-					newPos.Set (
-						_leftHandStartingPos.x + (_currentAttackPositionX - _leftHandStartingPos.x) * handPosCoeff, 
-						_leftHandStartingPos.y + (_attackPositionY - _leftHandStartingPos.y) * handPosCoeff, 
-						_leftHandStartingPos.z 
-					);
-					_leftHand.transform.position = newPos;
-				}
-
-				collider.enabled = !(_currentAttackHit || _timeSinceLastAttack > _handDownTime); // Cat was hit or hand is moving up
-				*/
-			} else {
+			if (_timeSinceLastAttack >= _currentAttackDelay) {
 				// Hands stoped moving (end of attack)
 				if (_currentAttackHit) {
 					_currentAttackDelay = _catHitAttackDelay;
