@@ -19,5 +19,6 @@ public class LootBox : Pickupable
         {
             Instantiate(_hairBall, transform.position, Quaternion.identity);
         }
+        Destroy(this.gameObject);
     }
 }
