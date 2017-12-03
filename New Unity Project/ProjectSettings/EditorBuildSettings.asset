@@ -15,8 +15,17 @@ EditorBuildSettings:
     path: Assets/Scenes/Level2.unity
     guid: 9c0e3e2e460fa408884920dd5b8c590a
   - enabled: 1
-    path: Assets/Scenes/AndreyLab.unity
-    guid: 06a3bdbb8f8bf466d977455c3a3384b1
+    path: Assets/Scenes/Level3.unity
+    guid: 4d3304b00a5294335bb0264a28599d96
+  - enabled: 1
+    path: Assets/Scenes/Level4.unity
+    guid: b2f10eee0258a48628ba4fbff1b5bf99
+  - enabled: 1
+    path: Assets/Scenes/Level5.unity
+    guid: 3febb70e66474450294d35f2f690188b
   - enabled: 1
     path: Assets/Scenes/BossLevel.unity
     guid: 18fbdfb6bb806402b81c437a4678be9c
+  - enabled: 1
+    path: Assets/Scenes/AndreyLab.unity
+    guid: 06a3bdbb8f8bf466d977455c3a3384b1
