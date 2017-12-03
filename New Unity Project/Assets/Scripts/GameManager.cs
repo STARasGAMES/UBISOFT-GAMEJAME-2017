@@ -30,24 +30,30 @@ public class GameManager : MonoBehaviour {
 
     public void NextLevel()
     {
-        StartCoroutine(NextLevelCoroutine());
-    }
-
-    private IEnumerator NextLevelCoroutine()
-    {
         _curSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        
+
         _curSceneIndex++;
         if (_curSceneIndex >= SceneManager.sceneCountInBuildSettings)
         {
             ToMainMenu();
-            yield break;
+            return;
         }
-        ;
+        StartCoroutine(LoadLevel(_curSceneIndex));
+    }
+
+    public void RestartLevel()
+    {
+        _curSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        StartCoroutine(LoadLevel(_curSceneIndex, true));
+    }
+
+    private IEnumerator LoadLevel(int levelId, bool resetHp = false)
+    {
         yield return StartCoroutine(_fadeController.FadeIn());
-        SceneManager.LoadScene(_curSceneIndex, LoadSceneMode.Single);
+        SceneManager.LoadScene(levelId, LoadSceneMode.Single);
         foreach (GameObject g in _playerObjects)
             g.SetActive(true);
+        _scriptablePlayer._lifes = 3;
         yield return StartCoroutine(_fadeController.FadeOut());
     }
     
