@@ -26,7 +26,7 @@ public class EnemyController : MonoBehaviour {
             Debug.DrawRay(_enemyT.transform.position, _enemyT.position - _points[_current].position, Color.red);
             while ((_enemyT.position - _points[_current].position).magnitude > 0.1f)
             {
-                Debug.Log("HERE");
+                //Debug.Log("HERE");
                 _enemyT.position = Vector3.MoveTowards(_enemyT.position, _points[_current].position, speed * Time.deltaTime);
                 yield return null;
             }

@@ -29,7 +29,7 @@ public class CatLifesController : MonoBehaviour {
     {
         GetComponent<CatController2D>().enabled = false;
         float random = UnityEngine.Random.Range(0, 10f)-5;
-        Debug.Log("Random: "+random);
+        //Debug.Log("Random: "+random);
         random = Mathf.Sign(random);
         
         Vector2 force = new Vector2(_takeDamageForce.x * random, _takeDamageForce.y);

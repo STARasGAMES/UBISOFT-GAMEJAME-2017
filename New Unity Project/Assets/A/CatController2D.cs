@@ -119,13 +119,13 @@ public class CatController2D : MonoBehaviour {
         if (!IsGrounded())
         {
             _rigidbody.AddForce(Vector2.down*_fallForce*Time.deltaTime);
-            Debug.Log("not Grounded");
+            //Debug.Log("not Grounded");
             return;
         }
 
         if (!CanSeePointer())
         {
-            Debug.Log("dont see pointer");
+            //Debug.Log("dont see pointer");
             return;
         }
         Vector2 targetPos = Vector3.zero;
@@ -147,12 +147,12 @@ public class CatController2D : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.down, 100);
             if (hit.transform == null)
             {
-                Debug.Log("cant find collider");
+                //Debug.Log("cant find collider");
                 return;
             }
             if (hit.collider.CompareTag("Obstacle"))
             {
-                Debug.Log("Pointer on Obstacle");
+                //Debug.Log("Pointer on Obstacle");
                 _pointer.SetActive(false);
                 return;
             }
@@ -161,27 +161,27 @@ public class CatController2D : MonoBehaviour {
             targetPos = hit.point;
             targetCollider = hit.collider;
         }
-        else
-            Debug.Log("error");
+        //else
+        //    Debug.Log("error");
 
         _pointer.SetActive(true);
         Vector2 some = targetPos - new Vector2(transform.position.x, transform.position.y);
         Vector2 dir = new Vector2(some.x, some.y);
         if ( Mathf.Abs(dir.x) < _stopRange)
         {
-            Debug.Log("in stop range");
+            //Debug.Log("in stop range");
             return;
         }
         if (targetCollider != _groundCollider && ((targetPos.y - transform.position.y) > _jumpUpHeight || _edgeCollider != null))
         {
-            Debug.Log("Need to jump");
+            //Debug.Log("Need to jump");
             if (dir.magnitude < _jumpRange)
             {
                 // JUMP UP
                 if ((targetPos.y - transform.position.y) > _jumpUpHeight)
                     if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
                     {
-                        Debug.Log("JUMP UP!");
+                        //Debug.Log("JUMP UP!");
                         _curJumpType = JumpType.up;
                         //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
                         _isJumping = true;
@@ -194,14 +194,14 @@ public class CatController2D : MonoBehaviour {
                     }
                     else
                     {
-                        Debug.Log("not enough speed");
+                        //Debug.Log("not enough speed");
                     }
                 // JUMP FORWARD
                 if (true)//(targetPos.y - transform.position.y) < _jumpUpHeight && (targetPos.y - transform.position.y) > -_jumpUpHeight)
                 {
                     if (Mathf.Abs(_rigidbody.velocity.x) > _jumpNeededSpeed)
                     {
-                        Debug.Log("JUMP FORWARD!");
+                        //Debug.Log("JUMP FORWARD!");
                         _curJumpType = JumpType.forward;
                         //_rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
                         _isJumping = true;
@@ -214,7 +214,7 @@ public class CatController2D : MonoBehaviour {
                     }
                     else
                     {
-                        Debug.Log("not enough speed");
+                        //Debug.Log("not enough speed");
                     }
                 }
             }
