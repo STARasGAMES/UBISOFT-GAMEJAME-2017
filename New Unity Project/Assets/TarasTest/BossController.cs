@@ -9,7 +9,7 @@ public class BossController : MonoBehaviour {
 	[SerializeField] float _defaultAttackDelay;
 	[SerializeField] float _catHitAttackDelay;
 	[SerializeField] float _attackPositionY;
-	[SerializeField] float _handMoveResetDelay = 1f;
+	[SerializeField] float _handMoveDownTime = 1f;
 	[SerializeField] float _handMoveTime = 0.5f;
 	[SerializeField] float _handMoveMultiplier = 0.5f;
 	[SerializeField] float _handReturnRotationTime = 0.2f;
@@ -23,7 +23,7 @@ public class BossController : MonoBehaviour {
 	[SerializeField] Transform _rightHand;
 	[SerializeField] public bool _currentAttackHit;
 
-
+	private CameraShake _cameraShake;
 	private Animator _leftHandAnimator;
 	private Animator _rightHandAnimator;
 	private float _targetHandZAngle;
@@ -31,10 +31,12 @@ public class BossController : MonoBehaviour {
 	private Vector3 _leftHandStartingPos = new Vector3();
 	private Vector3 _rightHandStartingPos = new Vector3();
 	private float _timeSinceLastAttack;
+	private bool _handLanded;
 	private float _currentAttackPositionX;
 
 	// Use this for initialization
 	void Start () {
+		_cameraShake = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<CameraShake> ();
 		_leftHandAnimator = _leftHand.GetComponent<Animator> ();
 		_rightHandAnimator = _rightHand.GetComponent<Animator> ();
 		_timeSinceLastAttack = 0f;
@@ -49,6 +51,7 @@ public class BossController : MonoBehaviour {
 	private void OnAttackStart() {
 		_currentAttackPositionX = _cat.position.x;
 		_currentAttackHit = false;
+		_handLanded = false;
 
 		if (_currentAttackPositionX < _leftHandStartingPos.x + _nearestHandThreshold) {
 			// Left side of the screen
@@ -78,8 +81,8 @@ public class BossController : MonoBehaviour {
 
 	private void OnAttackProgress() {
 		float moveCoeff = 0f;
-		if (_timeSinceLastAttack > _handMoveResetDelay) {
-			moveCoeff = 1f - ((_timeSinceLastAttack -_handMoveResetDelay) / _handReturnRotationTime);
+		if (_timeSinceLastAttack > _handMoveDownTime) {
+			moveCoeff = 1f - ((_timeSinceLastAttack -_handMoveDownTime) / _handReturnRotationTime);
 		} else {
 			moveCoeff = _timeSinceLastAttack / _handMoveTime;
 		}
@@ -96,7 +99,15 @@ public class BossController : MonoBehaviour {
 			_leftHand.transform.Rotate (rotation);
 		}
 
-		if (_timeSinceLastAttack >= _handMoveResetDelay + _handReturnRotationTime) {
+		if (_timeSinceLastAttack >= _handMoveDownTime) {
+			if (!_handLanded) {
+				// Произошел удар лапой
+				_cameraShake.DoShake();
+				_handLanded = true;
+			}
+		}
+
+		if (_timeSinceLastAttack >= _handMoveDownTime + _handReturnRotationTime) {
 			_rightHand.transform.position = _rightHandStartingPos;
 			_leftHand.transform.position = _leftHandStartingPos;
 		}

@@ -1064,7 +1064,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &710845699
 Transform:
   m_ObjectHideFlags: 0
@@ -1182,6 +1182,7 @@ GameObject:
   - component: {fileID: 899458714}
   - component: {fileID: 899458713}
   - component: {fileID: 899458712}
+  - component: {fileID: 899458716}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1252,6 +1253,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0.047000002, y: 0, z: 0}
+--- !u!114 &899458716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 899458711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eea7130f501dc734096f4148428f65d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Shaking: 0
 --- !u!1001 &910532593
 Prefab:
   m_ObjectHideFlags: 0
@@ -1759,6 +1772,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _boss: {fileID: 2001088303}
+  _scriptablePlayer: {fileID: 0}
 --- !u!50 &1380720740
 Rigidbody2D:
   serializedVersion: 4
@@ -1973,6 +1987,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _boss: {fileID: 2001088303}
+  _scriptablePlayer: {fileID: 0}
 --- !u!61 &1409952584
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2472,8 +2487,9 @@ MonoBehaviour:
   _defaultAttackDelay: 3.3
   _catHitAttackDelay: 6
   _attackPositionY: -3
-  _handMoveResetDelay: 0.7
-  _handMoveTime: 0.5
+  _handMoveDownTime: 0.5
+  _handMoveTime: 0.05
+  _handMoveMultiplier: 0.5
   _handReturnRotationTime: 0.3
   _handMoveCurve:
     serializedVersion: 2
@@ -2566,7 +2582,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxLifes: 10
-  lifes: 10
+  lifes: 0
+  _animator: {fileID: 0}
 --- !u!50 &2001088308
 Rigidbody2D:
   serializedVersion: 4
