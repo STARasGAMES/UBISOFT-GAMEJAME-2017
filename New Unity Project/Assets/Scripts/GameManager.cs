@@ -53,7 +53,8 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene(levelId, LoadSceneMode.Single);
         foreach (GameObject g in _playerObjects)
             g.SetActive(true);
-        _scriptablePlayer._lifes = 3;
+        if (resetHp)
+            _scriptablePlayer._lifes = 3;
         yield return StartCoroutine(_fadeController.FadeOut());
     }
     
