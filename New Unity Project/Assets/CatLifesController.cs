@@ -33,7 +33,7 @@ public class CatLifesController : MonoBehaviour {
         random = Mathf.Sign(random);
         
         Vector2 force = new Vector2(_takeDamageForce.x * random, _takeDamageForce.y);
-
+        GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
         _animator.SetTrigger("Hit");
 

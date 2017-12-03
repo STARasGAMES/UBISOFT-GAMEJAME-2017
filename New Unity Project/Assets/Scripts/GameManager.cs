@@ -62,5 +62,6 @@ public class GameManager : MonoBehaviour {
         Debug.Log("To main menu");
         SceneManager.LoadScene(0, LoadSceneMode.Single);
         Destroy(this.gameObject);
+        Cursor.visible = true;
     }
 }
