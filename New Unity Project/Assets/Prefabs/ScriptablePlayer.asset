@@ -11,4 +11,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51ff0b8f86e8ce94e818118a9e19f5d7, type: 3}
   m_Name: ScriptablePlayer
   m_EditorClassIdentifier: 
-  _lifes: 1
+  _lifes: 3

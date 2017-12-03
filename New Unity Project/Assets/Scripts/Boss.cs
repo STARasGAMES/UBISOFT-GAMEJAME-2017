@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Boss : MonoBehaviour {
 
-    [SerializeField] float maxLifes = 10;
-    public float lifes;
+    public int maxLifes = 10;
+    public int lifes;
+    [SerializeField] Animator _animator;
 
     private void Awake()
     {
@@ -14,6 +15,7 @@ public class Boss : MonoBehaviour {
 
     public void TakeDamage()
     {
+        _animator.SetTrigger("DogHit");
         lifes--;
         if (lifes <= 0)
             GameManager.Instance.NextLevel();
