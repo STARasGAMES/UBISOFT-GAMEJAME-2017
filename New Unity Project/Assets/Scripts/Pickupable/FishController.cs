@@ -8,5 +8,6 @@ public class FishController : Pickupable {
     protected override void Pickup()
     {
         _scriptablePlayer._lifes++;
+        Destroy(this.gameObject);
     }
 }

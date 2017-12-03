@@ -23,6 +23,10 @@ public class BossController : MonoBehaviour {
 	[SerializeField] Transform _rightHand;
 	[SerializeField] public bool _currentAttackHit;
 
+    [Header("Lootbox")]
+    [SerializeField] float _lootboxChance;
+    [SerializeField] LootboxSpawner _lootboxSpawner;
+
 	private CameraShake _cameraShake;
 	private Animator _leftHandAnimator;
 	private Animator _rightHandAnimator;
@@ -103,6 +107,9 @@ public class BossController : MonoBehaviour {
 			if (!_handLanded) {
 				// Произошел удар лапой
 				_cameraShake.DoShake();
+                float rand = UnityEngine.Random.Range(0f, 1f);
+                if (rand < _lootboxChance)
+                    _lootboxSpawner.Spawn();
 				_handLanded = true;
 			}
 		}

@@ -63,7 +63,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &61521972891574208
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -118,6 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scriptablePlayer: {fileID: 11400000, guid: 1ee3b4b6b19f32448a4af717be0412e0, type: 2}
+  _audioClip: {fileID: 0}
   _chanceOfFish: 0.3
   _hairBall: {fileID: 1013584902316090, guid: 5a668b1a55aba5c458ca105a8a9f27bd, type: 2}
 --- !u!212 &212577059583210304
